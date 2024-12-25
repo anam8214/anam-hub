@@ -1,0 +1,173 @@
+if game.Players.LocalPlayer.PlayerGui:FindFirstChild("sscriptrOC") then
+    game.Players.LocalPlayer.PlayerGui.sscriptrOC:Destroy()
+    warn("UI already exists and has been destroyed. Re-run the script to recreate it.")
+    return
+end
+
+print("UI creation started")
+warn("-+-------=- Script Start -=-------+-")
+
+local ui = Instance.new("ScreenGui")
+ui.Parent = game.Players.LocalPlayer.PlayerGui
+ui.ResetOnSpawn = false
+ui.IgnoreGuiInset = true
+ui.Name = "sscriptrOC"
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Parent = ui
+mainFrame.ZIndex = 999999
+mainFrame.Size = UDim2.new(0.25, 0, 0.2, 0) -- Smaller size
+mainFrame.Position = UDim2.new(0.1, 0, 0.6, 0) -- Positioned higher
+mainFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+mainFrame.BorderSizePixel = 1
+mainFrame.Name = "MainFrame"
+
+-- Credit Frame (Draggable)
+local creditFrame = Instance.new("Frame")
+creditFrame.Parent = mainFrame
+creditFrame.Size = UDim2.new(1, 0, 0.2, 0)
+creditFrame.Position = UDim2.new(0, 0, -0.2, 0)
+creditFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+creditFrame.BorderSizePixel = 1
+creditFrame.Name = "CreditFrame"
+
+local creditText = Instance.new("TextLabel")
+creditText.Parent = creditFrame
+creditText.Size = UDim2.new(1, 0, 1, 0)
+creditText.Text = "Credits: chinahuconkanu1 & anam82I4, ChatGPT"
+creditText.Font = Enum.Font.SourceSans
+creditText.TextScaled = true
+creditText.TextColor3 = Color3.fromRGB(0, 0, 0)
+creditText.BackgroundTransparency = 1
+
+local killButton = Instance.new("TextButton")
+killButton.Parent = mainFrame
+killButton.ZIndex = 999999
+killButton.Size = UDim2.new(0.2, 0, 0.25, 0)
+killButton.Position = UDim2.new(0.75, 0, 0.7, 0)
+killButton.Text = "Kill GUI"
+killButton.Font = Enum.Font.SourceSansBold
+killButton.TextScaled = true
+killButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+killButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+killButton.BorderSizePixel = 1
+
+local colorBox = Instance.new("TextBox")
+colorBox.Parent = mainFrame
+colorBox.ZIndex = 999999
+colorBox.Size = UDim2.new(0.8, 0, 0.25, 0)
+colorBox.AnchorPoint = Vector2.new(0.5, 0)
+colorBox.Position = UDim2.new(0.5, 0, 0.1, 0)
+colorBox.PlaceholderText = "Enter color (R, G, B)"
+colorBox.Font = Enum.Font.SourceSans
+colorBox.TextScaled = true
+colorBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+colorBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+colorBox.BorderSizePixel = 1
+
+local textBox = Instance.new("TextBox")
+textBox.Parent = mainFrame
+textBox.ZIndex = 999999
+textBox.Size = UDim2.new(0.8, 0, 0.25, 0)
+textBox.AnchorPoint = Vector2.new(0.5, 0)
+textBox.Position = UDim2.new(0.5, 0, 0.4, 0)
+textBox.PlaceholderText = "Enter text (default: 'hi')"
+textBox.Font = Enum.Font.SourceSans
+textBox.TextScaled = true
+textBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+textBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+textBox.BorderSizePixel = 1
+
+local button1 = Instance.new("TextButton")
+button1.Parent = mainFrame
+button1.ZIndex = 999999
+button1.Size = UDim2.new(0.5, 0, 0.25, 0)
+button1.AnchorPoint = Vector2.new(0.5, 0)
+button1.Position = UDim2.new(0.3, 0, 0.7, 0)
+button1.Text = "Fire Event"
+button1.Font = Enum.Font.SourceSansBold
+button1.TextScaled = true
+button1.TextColor3 = Color3.fromRGB(0, 0, 0)
+button1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+button1.BorderSizePixel = 1
+
+-- Drag functionality
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function updateInput(input)
+    local delta = input.Position - dragStart
+    mainFrame.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
+
+creditFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+creditFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        updateInput(input)
+    end
+end)
+
+button1.MouseButton1Click:Connect(function()
+    local text = textBox.Text
+    if text == "" then
+        text = "hi"
+    end
+
+    local colorInput = colorBox.Text
+    local color = Color3.fromRGB(0, 255, 0)
+    if colorInput ~= "" then
+        local values = string.split(colorInput, ",")
+        if #values == 3 then
+            local r = tonumber(values[1])
+            local g = tonumber(values[2])
+            local b = tonumber(values[3])
+            if r and g and b then
+                color = Color3.fromRGB(math.clamp(r, 0, 255), math.clamp(g, 0, 255), math.clamp(b, 0, 255))
+            else
+                warn("Invalid color values. Using default color.")
+            end
+        else
+            warn("Color must have 3 values (R, G, B). Using default color.")
+        end
+    end
+
+    local success, err = pcall(function()
+        game:GetService("Players").LocalPlayer.PlayerGui.LocalOutput:Fire(text, color)
+    end)
+    if success then
+        print("Event fired successfully with text:", text, "and color:", color)
+    else
+        warn("Failed to fire event:", err)
+    end
+end)
+
+killButton.MouseButton1Click:Connect(function()
+    ui:Destroy()
+    print("GUI destroyed.")
+end)
