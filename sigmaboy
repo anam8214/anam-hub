@@ -27,7 +27,7 @@ TopContainer()
 Frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(TopContainer)
 
 UICorner.Parent = Frame
-UICorner.CornerRadius = UDim.new(0, 10)  -- Adds rounded corners to the frame
+UICorner.CornerRadius = UDim.new(0, 10)
 
 TextButton.Parent = Frame
 TextButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
@@ -41,14 +41,13 @@ TextButton.TextSize = 14
 TextButton.Text = "T Tool"
 
 UICorner_2.Parent = TextButton
-UICorner_2.CornerRadius = UDim.new(0, 10)  -- Rounded corners for the T Tool button
+UICorner_2.CornerRadius = UDim.new(0, 10)
 
--- New Close Button
 CloseButton.Parent = Frame
 CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 CloseButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 CloseButton.BorderSizePixel = 0
-CloseButton.Position = UDim2.new(1, -25, 0, -5)  -- Positioned at top right of the frame
+CloseButton.Position = UDim2.new(1, -25, 0, -5)
 CloseButton.Size = UDim2.new(0, 20, 0, 20)
 CloseButton.Font = Enum.Font.GothamSemibold
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -56,10 +55,10 @@ CloseButton.TextSize = 14
 CloseButton.Text = "X"
 
 UICorner_3.Parent = CloseButton
-UICorner_3.CornerRadius = UDim.new(1, 0)  -- Fully rounded corners for the close button
+UICorner_3.CornerRadius = UDim.new(1, 0)
 
 CloseButton.MouseButton1Click:Connect(function()
-    Lnr:Destroy() -- Destroys the entire GUI when the close button is clicked
+    Lnr:Destroy()
 end)
 
 TextButton.MouseButton1Click:Connect(function()
