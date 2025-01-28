@@ -1,0 +1,281 @@
+if game.Players.LocalPlayer.PlayerGui:FindFirstChild("sscriptrOC") then
+    game.Players.LocalPlayer.PlayerGui.sscriptrOC:Destroy()
+    return
+end
+
+local ui = Instance.new("ScreenGui")
+ui.Parent = game.Players.LocalPlayer.PlayerGui
+ui.ResetOnSpawn = false
+ui.IgnoreGuiInset = true
+ui.Name = "sscriptrOC"
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Parent = ui
+mainFrame.Size = UDim2.new(0.3, 0, 0.2, 0)
+mainFrame.Position = UDim2.new(0.35, 0, 0.4, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+mainFrame.BorderSizePixel = 1
+mainFrame.Name = "MainFrame"
+
+local header = Instance.new("Frame")
+header.Parent = mainFrame
+header.Size = UDim2.new(1, 0, 0.2, 0)
+header.Position = UDim2.new(0, 0, 0, 0)
+header.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+header.BorderSizePixel = 1
+
+local headerText = Instance.new("TextLabel")
+headerText.Parent = header
+headerText.Size = UDim2.new(1, 0, 1, 0)
+headerText.Text = "Obby Stealer Script"
+headerText.Font = Enum.Font.SourceSans
+headerText.TextScaled = true
+headerText.TextColor3 = Color3.fromRGB(0, 0, 0)
+headerText.BackgroundTransparency = 1
+
+local exitButton = Instance.new("TextButton")
+exitButton.Parent = header
+exitButton.Size = UDim2.new(0, 20, 0, 20)
+exitButton.Position = UDim2.new(1, -25, 0, 5)
+exitButton.Text = "X"
+exitButton.Font = Enum.Font.SourceSansBold
+exitButton.TextScaled = true
+exitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+exitButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+exitButton.BorderSizePixel = 1
+
+exitButton.MouseButton1Click:Connect(function()
+    ui:Destroy()
+end)
+
+local textBox = Instance.new("TextBox")
+textBox.Parent = mainFrame
+textBox.Size = UDim2.new(0.8, 0, 0.4, 0)
+textBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+textBox.PlaceholderText = "Enter Player Name or Display Name"
+textBox.Font = Enum.Font.SourceSans
+textBox.Text = ""
+textBox.TextScaled = true
+textBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+textBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+textBox.BorderSizePixel = 1
+
+local submitButton = Instance.new("TextButton")
+submitButton.Parent = mainFrame
+submitButton.Size = UDim2.new(0.5, 0, 0.2, 0)
+submitButton.Position = UDim2.new(0.25, 0, 0.75, 0)
+submitButton.Text = "Copy"
+submitButton.Font = Enum.Font.SourceSansBold
+submitButton.TextScaled = true
+submitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+submitButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+submitButton.BorderSizePixel = 1
+
+local dragging = false
+local dragStart, startPos
+
+header.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+header.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+local resizeHandle = Instance.new("Frame")
+resizeHandle.Parent = mainFrame
+resizeHandle.Size = UDim2.new(0, 10, 0, 10)
+resizeHandle.Position = UDim2.new(1, -10, 1, -10)
+resizeHandle.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+resizeHandle.BorderSizePixel = 1
+resizeHandle.Name = "ResizeHandle"
+
+local resizing = false
+local resizeStart, startSize
+
+resizeHandle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        resizing = true
+        resizeStart = input.Position
+        startSize = mainFrame.Size
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                resizing = false
+            end
+        end)
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - resizeStart
+        local newWidth = math.max(startSize.X.Offset + delta.X, -200)
+        local newHeight = math.max(startSize.Y.Offset + delta.Y, -100)
+        mainFrame.Size = UDim2.new(startSize.X.Scale, newWidth, startSize.Y.Scale, newHeight)
+    end
+end)
+
+local Input = textBox
+local SelectText = Instance.new("TextLabel")
+SelectText.Parent = mainFrame
+SelectText.Size = UDim2.new(0.8, 0, 0.2, 0)
+SelectText.Position = UDim2.new(0.1, 0, 1, 0)
+SelectText.Font = Enum.Font.SourceSans
+SelectText.TextScaled = true
+SelectText.TextColor3 = Color3.fromRGB(0, 0, 0)
+SelectText.BackgroundTransparency = 1
+SelectText.Text = "Selecting:"
+
+Input:GetPropertyChangedSignal("Text"):Connect(function()
+    local Text = Input.Text
+    T = nil
+    if Text ~= "" then
+        local PlayerTable = game.Players:GetChildren()
+        for _, currentPlayer in ipairs(PlayerTable) do
+            if string.lower(currentPlayer.Name):sub(1, #Text) == string.lower(Text) then
+                T = currentPlayer
+                break
+            end
+        end
+        if not T then
+            for _, currentPlayer in ipairs(PlayerTable) do
+                if string.lower(currentPlayer.DisplayName):sub(1, #Text) == string.lower(Text) then
+                    T = currentPlayer
+                    break
+                end
+            end
+        end
+    end
+
+    if T then
+        SelectText.Text = "Selecting: " .. T.Name .. " (" .. T.DisplayName .. ")"
+    else
+        SelectText.Text = "Selecting:"
+    end
+end)
+
+local cancelCopying = false
+
+local cancelButton = Instance.new("TextButton")
+cancelButton.Parent = mainFrame
+cancelButton.Size = submitButton.Size
+cancelButton.Position = submitButton.Position
+cancelButton.Text = "Cancel"
+cancelButton.Font = Enum.Font.SourceSansBold
+cancelButton.TextScaled = true
+cancelButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+cancelButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+cancelButton.BorderSizePixel = 1
+cancelButton.Visible = false
+
+cancelButton.MouseButton1Click:Connect(function()
+    cancelCopying = true
+    cancelButton.Visible = false
+    submitButton.Visible = true
+end)
+
+submitButton.MouseButton1Click:Connect(function()
+    cancelCopying = false
+    submitButton.Visible = false
+    cancelButton.Visible = true
+    if T then
+        game:GetService("ReplicatedStorage").Events.ClearObby:InvokeServer()
+
+        local playerObby = workspace.Obbies:FindFirstChild(T.Name)
+        local localPlayerObby = workspace.Obbies:FindFirstChild(game.Players.LocalPlayer.Name)
+        if playerObby and playerObby.Items and playerObby.Items.Parts and localPlayerObby then
+            local gatePosition = localPlayerObby.GetObby.Gate.Position
+            local obbyParts = playerObby.Items.Parts:GetChildren()
+
+            for _, part in ipairs(obbyParts) do
+                if cancelCopying then break end
+                if part:IsA("BasePart") then
+                    print("Copied a part!")
+                    local P = part.Position - playerObby.GetObby.Gate.Position
+                    local R = part.CFrame - part.Position
+                    local S = part.Size
+
+                    local existingParts = workspace.Obbies[game.Players.LocalPlayer.Name].Items.Parts:GetChildren()
+
+                    local args1 = {
+                        [1] = part.Name,
+                        [2] = CFrame.new(gatePosition + P) * CFrame.Angles(math.rad(R.X), math.rad(R.Y), math.rad(R.Z))
+                    }
+                    game:GetService("ReplicatedStorage").Events.AddObject:InvokeServer(unpack(args1))
+
+                    local newPart = nil
+                    for _, candidate in ipairs(workspace.Obbies[game.Players.LocalPlayer.Name].Items.Parts:GetChildren()) do
+                        if not table.find(existingParts, candidate) then
+                            newPart = candidate
+                            break
+                        end
+                    end
+
+                    if newPart then
+                        -- Property update in sequence
+                        local propertiesToUpdate = {
+                            { Name = "Color", Value = part.Color },
+                            { Name = "Material", Value = part.Material.Name },
+                            { Name = "Transparency", Value = part.Transparency },
+                            { Name = "Reflectance", Value = part.Reflectance },
+                            { Name = "Surface", Value = part.TopSurface.Name },
+                            { Name = "CanCollide", Value = part.CanCollide },
+                            { Name = "CastShadow", Value = part.CastShadow }
+                        }
+
+                        for _, prop in ipairs(propertiesToUpdate) do
+                            local args = {
+                                [1] = { newPart },
+                                [2] = prop.Name,
+                                [3] = prop.Value
+                            }
+                            local stop = false
+                            repeat
+                                stop = game:GetService("ReplicatedStorage").Events.PaintObject:InvokeServer(unpack(args))
+                            until stop == true
+                        end
+
+                        -- Moving and resizing
+                        local args2 = {
+                            [1] = {
+                                [1] = {
+                                    [1] = newPart,
+                                    [2] = CFrame.new(gatePosition + P) * R,
+                                    [3] = Vector3.new(S.X, S.Y, S.Z)
+                                }
+                            }
+                        }
+                        game:GetService("ReplicatedStorage").Events.MoveObject:InvokeServer(unpack(args2))
+
+                        task.wait(1)
+                    end
+                end
+            end
+        end
+    end
+    cancelButton.Visible = false
+    submitButton.Visible = true
+end)
